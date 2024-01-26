@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_bloc_modular_demo/text_field_module/text_field_module_cubit.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:rxdart/rxdart.dart';
 
@@ -14,18 +13,18 @@ class HomeCubit extends Cubit<HomeState> {
         CombineLatestStream([userNameState, passwordState], (values) => values)
             .listen((event) {
       final userNameState = event[0];
-      _validateUserName(userNameState.text);
+      _validateUserName(userNameState);
 
       final passwordState = event[1];
-      _validatePassword(passwordState.text);
+      _validatePassword(passwordState);
 
       _validateSubmit();
     });
   }
 
-  final Stream<TextFieldModuleState> userNameState;
-  final Stream<TextFieldModuleState> passwordState;
-  StreamSubscription<List<TextFieldModuleState>>? _stateSubscription;
+  final Stream<String> userNameState;
+  final Stream<String> passwordState;
+  StreamSubscription<List<String>>? _stateSubscription;
 
   void _validateUserName(String text) {
     if (text.isEmpty) {

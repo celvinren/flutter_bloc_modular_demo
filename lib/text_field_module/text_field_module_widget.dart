@@ -9,10 +9,8 @@ class TextFieldModuleConfig {
   const TextFieldModuleConfig(this.id);
   final String id;
 
-  Stream<TextFieldModuleState> get textFieldModuleStream => GetIt.I
-      .get<TextFieldModuleCubit>(instanceName: id)
-      .stream
-      .startWith(TextFieldModuleState());
+  Stream<String> get textFieldModuleStream =>
+      GetIt.I.get<TextFieldModuleCubit>(instanceName: id).stream.startWith('');
 
   Widget get textFieldModule => _TextFieldModule(
         config: TextFieldModuleConfig(id),
