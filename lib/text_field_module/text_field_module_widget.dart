@@ -5,46 +5,51 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:get_it/get_it.dart';
 import 'package:rxdart/rxdart.dart';
 
-extension TextFieldModuleCubitExtension on String {
+class TextFieldModuleConfig {
+  const TextFieldModuleConfig(this.id);
+  final String id;
+
   Stream<TextFieldModuleState> get textFieldModuleStream => GetIt.I
-      .get<TextFieldModuleCubit>(instanceName: this)
+      .get<TextFieldModuleCubit>(instanceName: id)
       .stream
       .startWith(TextFieldModuleState());
 
-  TextFieldModule get textFieldModule => TextFieldModule(id: this);
+  Widget get textFieldModule => _TextFieldModule(
+        config: TextFieldModuleConfig(id),
+      );
 
   TextFieldModuleCubit get textFieldModuleCubit =>
-      GetIt.I.get<TextFieldModuleCubit>(instanceName: this);
+      GetIt.I.get<TextFieldModuleCubit>(instanceName: id);
 
   TextFieldModuleCubit get textFieldModuleRegister {
     return GetIt.I.registerSingleton<TextFieldModuleCubit>(
       TextFieldModuleCubit(),
-      instanceName: this,
+      instanceName: id,
     );
   }
 
   void get textFieldModuleUnRegister {
     GetIt.I.unregister<TextFieldModuleCubit>(
-      instanceName: this,
+      instanceName: id,
     );
   }
 }
 
-class TextFieldModule extends HookWidget {
-  const TextFieldModule({required this.id, super.key});
+class _TextFieldModule extends HookWidget {
+  const _TextFieldModule({required this.config});
 
-  final String id;
+  final TextFieldModuleConfig config;
 
   @override
   Widget build(BuildContext context) {
-    id.textFieldModuleRegister;
+    config.textFieldModuleRegister;
 
     useEffect(() {
       return () {
         /// This is similar dispose() method in StatefulWidget
         /// This will be called when the widget is removed from the widget tree
         /// This is where we can dispose of any resources
-        id.textFieldModuleUnRegister;
+        config.textFieldModuleUnRegister;
       };
     }, const []);
 
@@ -52,7 +57,7 @@ class TextFieldModule extends HookWidget {
         future: GetIt.instance.allReady(),
         builder: (context, data) {
           if (data.hasData) {
-            return _TextField(id.textFieldModuleCubit);
+            return _TextField(config.textFieldModuleCubit);
           } else {
             return const Center(child: CircularProgressIndicator());
           }
