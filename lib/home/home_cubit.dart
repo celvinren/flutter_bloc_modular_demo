@@ -1,31 +1,29 @@
 import 'dart:async';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_bloc_modular_demo/text_field_module/text_field_module_cubit.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:rxdart/rxdart.dart';
 
 part 'home_cubit.freezed.dart';
 
 class HomeCubit extends Cubit<HomeState> {
-  HomeCubit({required this.userNameState, required this.passwordState})
-      : super(const HomeState()) {
-    _stateSubscription =
-        CombineLatestStream([userNameState, passwordState], (values) => values)
-            .listen((event) {
+  HomeCubit() : super(const HomeState()) {
+    _stateSubscription = CombineLatestStream(
+            [userNameState.stream, passwordState.stream], (values) => values)
+        .listen((event) {
       final userNameState = event[0];
-      _validateUserName(userNameState.text);
+      _validateUserName(userNameState);
 
       final passwordState = event[1];
-      _validatePassword(passwordState.text);
+      _validatePassword(passwordState);
 
       _validateSubmit();
     });
   }
 
-  final Stream<TextFieldModuleState> userNameState;
-  final Stream<TextFieldModuleState> passwordState;
-  StreamSubscription<List<TextFieldModuleState>>? _stateSubscription;
+  final StreamController<String> userNameState = StreamController();
+  final StreamController<String> passwordState = StreamController();
+  StreamSubscription<List<String>>? _stateSubscription;
 
   void _validateUserName(String text) {
     if (text.isEmpty) {
@@ -68,6 +66,8 @@ class HomeCubit extends Cubit<HomeState> {
   @override
   Future<void> close() {
     _stateSubscription?.cancel();
+    userNameState.close();
+    passwordState.close();
     return super.close();
   }
 }

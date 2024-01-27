@@ -12,10 +12,7 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => HomeCubit(
-        userNameState: kUserName.textFieldModuleStream,
-        passwordState: kPassword.textFieldModuleStream,
-      ),
+      create: (context) => HomeCubit(),
       child: const _HomeView(),
     );
   }
@@ -35,8 +32,12 @@ class _HomeView extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            kUserName.textFieldModule,
-            kPassword.textFieldModule,
+            TextFieldModule(
+              interface: context.read<HomeCubit>().userNameState..sink.add(''),
+            ),
+            TextFieldModule(
+              interface: context.read<HomeCubit>().passwordState..sink.add(''),
+            ),
             BlocBuilder<HomeCubit, HomeState>(
               builder: (constex, state) {
                 return Column(
