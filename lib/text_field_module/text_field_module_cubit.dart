@@ -1,10 +1,10 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-class TextFieldModuleCubit extends Cubit<String> {
-  TextFieldModuleCubit() : super('');
+class TextFieldModuleCubit<T> extends Cubit<T?> {
+  TextFieldModuleCubit({T? defaultValue}) : super(defaultValue);
 
-  void updateText(String text) {
-    emit(text);
+  void update(T value) {
+    emit(value);
   }
 }
 

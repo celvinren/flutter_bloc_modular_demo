@@ -6,14 +6,17 @@ import 'package:get_it/get_it.dart';
 import 'package:rxdart/rxdart.dart';
 
 class TextFieldModuleConfig {
-  const TextFieldModuleConfig(this.id);
+  const TextFieldModuleConfig(this.id, {required this.child});
   final String id;
+  final Widget child;
 
-  Stream<String> get textFieldModuleStream =>
-      GetIt.I.get<TextFieldModuleCubit>(instanceName: id).stream.startWith('');
+  Stream<String?> get textFieldModuleStream => GetIt.I
+      .get<TextFieldModuleCubit<String>>(instanceName: id)
+      .stream
+      .startWith('');
 
   Widget get textFieldModule => _TextFieldModule(
-        config: TextFieldModuleConfig(id),
+        config: this,
       );
 
   TextFieldModuleCubit get textFieldModuleCubit =>
@@ -21,7 +24,7 @@ class TextFieldModuleConfig {
 
   TextFieldModuleCubit get textFieldModuleRegister {
     return GetIt.I.registerSingleton<TextFieldModuleCubit>(
-      TextFieldModuleCubit(),
+      TextFieldModuleCubit<String>(defaultValue: ''),
       instanceName: id,
     );
   }
@@ -34,7 +37,9 @@ class TextFieldModuleConfig {
 }
 
 class _TextFieldModule extends HookWidget {
-  const _TextFieldModule({required this.config});
+  const _TextFieldModule({
+    required this.config,
+  });
 
   final TextFieldModuleConfig config;
 
@@ -55,7 +60,7 @@ class _TextFieldModule extends HookWidget {
         future: GetIt.instance.allReady(),
         builder: (context, data) {
           if (data.hasData) {
-            return _TextField(config.textFieldModuleCubit);
+            return _TextField(config: config);
           } else {
             return const Center(child: CircularProgressIndicator());
           }
@@ -64,26 +69,28 @@ class _TextFieldModule extends HookWidget {
 }
 
 class _TextField extends StatelessWidget {
-  const _TextField(this.bloc);
-  final TextFieldModuleCubit bloc;
+  const _TextField({required this.config});
+  final TextFieldModuleConfig config;
 
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => bloc,
-      child: const _Body(),
+      create: (context) => config.textFieldModuleCubit,
+      child: _Body(config: config),
     );
   }
 }
 
 class _Body extends StatelessWidget {
-  const _Body();
+  const _Body({required this.config});
+  final TextFieldModuleConfig config;
 
   @override
   Widget build(BuildContext context) {
     /// return your widget here
-    return TextField(
-      onChanged: context.read<TextFieldModuleCubit>().updateText,
-    );
+    return config.child;
+    // return TextField(
+    //   onChanged: context.read<TextFieldModuleCubit<String>>().update,
+    // );
   }
 }

@@ -13,18 +13,18 @@ class HomeCubit extends Cubit<HomeState> {
         CombineLatestStream([userNameState, passwordState], (values) => values)
             .listen((event) {
       final userNameState = event[0];
-      _validateUserName(userNameState);
+      _validateUserName(userNameState ?? '');
 
       final passwordState = event[1];
-      _validatePassword(passwordState);
+      _validatePassword(passwordState ?? '');
 
       _validateSubmit();
     });
   }
 
-  final Stream<String> userNameState;
-  final Stream<String> passwordState;
-  StreamSubscription<List<String>>? _stateSubscription;
+  final Stream<String?> userNameState;
+  final Stream<String?> passwordState;
+  StreamSubscription<List<String?>>? _stateSubscription;
 
   void _validateUserName(String text) {
     if (text.isEmpty) {
