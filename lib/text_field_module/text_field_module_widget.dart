@@ -5,54 +5,53 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:get_it/get_it.dart';
 import 'package:rxdart/rxdart.dart';
 
-class TextFieldModuleConfig {
-  const TextFieldModuleConfig(this.id, {required this.childBuilder});
+class ModuleConfig<N extends ModuleController<T>, T> {
+  const ModuleConfig(this.id,
+      {required this.childBuilder, required this.controller});
   final String id;
-  final Widget Function(TextFieldModuleCubit<String>) childBuilder;
+  final N controller;
+  final Widget Function(N) childBuilder;
 
-  Stream<String?> get textFieldModuleStream => GetIt.I
-      .get<TextFieldModuleCubit<String>>(instanceName: id)
-      .stream
-      .startWith('');
+  Stream<T?> get moduleResultStream =>
+      GetIt.I.get<N>(instanceName: id).stream.startWith(controller.state);
 
-  Widget get textFieldModule => _TextFieldModule(
+  Widget get widget => _ModuleWidget(
         config: this,
       );
 
-  TextFieldModuleCubit<String> get textFieldModuleCubit =>
-      GetIt.I.get<TextFieldModuleCubit<String>>(instanceName: id);
+  // N get textFieldModuleCubit => GetIt.I.get<N>(instanceName: id);
 
-  TextFieldModuleCubit<String> get textFieldModuleRegister {
-    return GetIt.I.registerSingleton<TextFieldModuleCubit<String>>(
-      TextFieldModuleCubit<String>(defaultValue: ''),
+  N get registerModule {
+    return GetIt.I.registerSingleton<N>(
+      controller,
       instanceName: id,
     );
   }
 
-  void get textFieldModuleUnRegister {
-    GetIt.I.unregister<TextFieldModuleCubit<String>>(
+  void get unregisterModule {
+    GetIt.I.unregister<ModuleController<T>>(
       instanceName: id,
     );
   }
 }
 
-class _TextFieldModule extends HookWidget {
-  const _TextFieldModule({
+class _ModuleWidget<N extends ModuleController<T>, T> extends HookWidget {
+  const _ModuleWidget({
     required this.config,
   });
 
-  final TextFieldModuleConfig config;
+  final ModuleConfig<N, T> config;
 
   @override
   Widget build(BuildContext context) {
-    config.textFieldModuleRegister;
+    config.registerModule;
 
     useEffect(() {
       return () {
         /// This is similar dispose() method in StatefulWidget
         /// This will be called when the widget is removed from the widget tree
         /// This is where we can dispose of any resources
-        config.textFieldModuleUnRegister;
+        config.unregisterModule;
       };
     }, const []);
 
@@ -60,7 +59,7 @@ class _TextFieldModule extends HookWidget {
         future: GetIt.instance.allReady(),
         builder: (context, data) {
           if (data.hasData) {
-            return _TextField(config: config);
+            return _ProviderWrapper(config: config);
           } else {
             return const Center(child: CircularProgressIndicator());
           }
@@ -68,29 +67,27 @@ class _TextFieldModule extends HookWidget {
   }
 }
 
-class _TextField extends StatelessWidget {
-  const _TextField({required this.config});
-  final TextFieldModuleConfig config;
+class _ProviderWrapper<N extends ModuleController<T>, T>
+    extends StatelessWidget {
+  const _ProviderWrapper({required this.config});
+  final ModuleConfig<N, T> config;
 
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => config.textFieldModuleCubit,
+      create: (context) => config.controller,
       child: _Body(config: config),
     );
   }
 }
 
-class _Body extends StatelessWidget {
+class _Body<N extends ModuleController<T>, T> extends StatelessWidget {
   const _Body({required this.config});
-  final TextFieldModuleConfig config;
+  final ModuleConfig<N, T> config;
 
   @override
   Widget build(BuildContext context) {
     /// return your widget here
-    return config.childBuilder(config.textFieldModuleCubit);
-    // return TextField(
-    //   onChanged: context.read<TextFieldModuleCubit<String>>().update,
-    // );
+    return config.childBuilder(config.controller);
   }
 }
