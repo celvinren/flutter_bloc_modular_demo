@@ -6,20 +6,17 @@ import 'package:get_it/get_it.dart';
 import 'package:rxdart/rxdart.dart';
 
 class ModuleConfig<N extends ModuleController<T>, T> {
-  const ModuleConfig(this.id,
-      {required this.childBuilder, required this.controller});
+  ModuleConfig({required this.id, required this.controller});
   final String id;
   final N controller;
-  final Widget Function(N) childBuilder;
+  // final Widget Function(N) childBuilder;
 
   Stream<T?> get moduleResultStream =>
       GetIt.I.get<N>(instanceName: id).stream.startWith(controller.state);
 
-  Widget get widget => _ModuleWidget(
-        config: this,
-      );
-
-  // N get textFieldModuleCubit => GetIt.I.get<N>(instanceName: id);
+  // Widget get widget => _ModuleWidget(
+  //       config: this,
+  //     );
 
   N get registerModule {
     return GetIt.I.registerSingleton<N>(
@@ -35,12 +32,32 @@ class ModuleConfig<N extends ModuleController<T>, T> {
   }
 }
 
-class _ModuleWidget<N extends ModuleController<T>, T> extends HookWidget {
-  const _ModuleWidget({
+class ModuleBuilder<N extends ModuleController<T>, T> extends StatelessWidget {
+  const ModuleBuilder({
+    super.key,
     required this.config,
+    required this.builder,
   });
 
   final ModuleConfig<N, T> config;
+  final Widget Function(N) builder;
+  @override
+  Widget build(BuildContext context) {
+    return _ModuleWidget(
+      config: config,
+      childBuilder: builder,
+    );
+  }
+}
+
+class _ModuleWidget<N extends ModuleController<T>, T> extends HookWidget {
+  const _ModuleWidget({
+    required this.config,
+    required this.childBuilder,
+  });
+
+  final ModuleConfig<N, T> config;
+  final Widget Function(N) childBuilder;
 
   @override
   Widget build(BuildContext context) {
@@ -59,7 +76,10 @@ class _ModuleWidget<N extends ModuleController<T>, T> extends HookWidget {
         future: GetIt.instance.allReady(),
         builder: (context, data) {
           if (data.hasData) {
-            return _ProviderWrapper(config: config);
+            return _ProviderWrapper(
+              config: config,
+              childBuilder: childBuilder,
+            );
           } else {
             return const Center(child: CircularProgressIndicator());
           }
@@ -69,25 +89,36 @@ class _ModuleWidget<N extends ModuleController<T>, T> extends HookWidget {
 
 class _ProviderWrapper<N extends ModuleController<T>, T>
     extends StatelessWidget {
-  const _ProviderWrapper({required this.config});
+  const _ProviderWrapper({
+    required this.config,
+    required this.childBuilder,
+  });
   final ModuleConfig<N, T> config;
+  final Widget Function(N) childBuilder;
 
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (context) => config.controller,
-      child: _Body(config: config),
+      child: _Body(
+        config: config,
+        childBuilder: childBuilder,
+      ),
     );
   }
 }
 
 class _Body<N extends ModuleController<T>, T> extends StatelessWidget {
-  const _Body({required this.config});
+  const _Body({
+    required this.config,
+    required this.childBuilder,
+  });
   final ModuleConfig<N, T> config;
+  final Widget Function(N) childBuilder;
 
   @override
   Widget build(BuildContext context) {
     /// return your widget here
-    return config.childBuilder(config.controller);
+    return childBuilder(config.controller);
   }
 }

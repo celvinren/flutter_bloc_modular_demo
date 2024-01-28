@@ -5,20 +5,12 @@ import 'package:flutter_bloc_modular_demo/text_field_module/text_field_module_cu
 import 'package:flutter_bloc_modular_demo/text_field_module/text_field_module_widget.dart';
 
 final userNameTextFieldConfig = ModuleConfig<TestController, String>(
-  'userName',
+  id: 'userName',
   controller: TestController(),
-  childBuilder: (bloc) => TextField(
-    onChanged: bloc.update,
-  ),
 );
 final passwordTextFieldConfig = ModuleConfig<TestController, String>(
-  'password',
+  id: 'password',
   controller: TestController(),
-  childBuilder: (bloc) {
-    return TextField(
-      onChanged: bloc.update,
-    );
-  },
 );
 
 class HomePage extends StatelessWidget {
@@ -50,8 +42,18 @@ class _HomeView extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            userNameTextFieldConfig.widget,
-            passwordTextFieldConfig.widget,
+            ModuleBuilder<TestController, String>(
+              config: userNameTextFieldConfig,
+              builder: (bloc) => TextField(
+                onChanged: bloc.update,
+              ),
+            ),
+            ModuleBuilder<TestController, String>(
+              config: passwordTextFieldConfig,
+              builder: (bloc) => TextField(
+                onChanged: bloc.update,
+              ),
+            ),
             BlocBuilder<HomeCubit, HomeState>(
               builder: (constex, state) {
                 return Column(
