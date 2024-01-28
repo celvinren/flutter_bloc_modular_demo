@@ -5,9 +5,9 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:get_it/get_it.dart';
 import 'package:rxdart/rxdart.dart';
 
-class ModuleConfig<N extends ModuleController<T>, T> {
-  ModuleConfig({required this.id, required this.controller});
-  final String id;
+class ModuleConfig<N extends ModuleCubit<T>, T> {
+  ModuleConfig({required this.controller});
+  final String id = UniqueKey().toString();
   final N controller;
   // final Widget Function(N) childBuilder;
 
@@ -26,13 +26,13 @@ class ModuleConfig<N extends ModuleController<T>, T> {
   }
 
   void get unregisterModule {
-    GetIt.I.unregister<ModuleController<T>>(
+    GetIt.I.unregister<N>(
       instanceName: id,
     );
   }
 }
 
-class ModuleBuilder<N extends ModuleController<T>, T> extends StatelessWidget {
+class ModuleBuilder<N extends ModuleCubit<T>, T> extends StatelessWidget {
   const ModuleBuilder({
     super.key,
     required this.config,
@@ -50,7 +50,7 @@ class ModuleBuilder<N extends ModuleController<T>, T> extends StatelessWidget {
   }
 }
 
-class _ModuleWidget<N extends ModuleController<T>, T> extends HookWidget {
+class _ModuleWidget<N extends ModuleCubit<T>, T> extends HookWidget {
   const _ModuleWidget({
     required this.config,
     required this.childBuilder,
@@ -87,8 +87,7 @@ class _ModuleWidget<N extends ModuleController<T>, T> extends HookWidget {
   }
 }
 
-class _ProviderWrapper<N extends ModuleController<T>, T>
-    extends StatelessWidget {
+class _ProviderWrapper<N extends ModuleCubit<T>, T> extends StatelessWidget {
   const _ProviderWrapper({
     required this.config,
     required this.childBuilder,
@@ -108,7 +107,7 @@ class _ProviderWrapper<N extends ModuleController<T>, T>
   }
 }
 
-class _Body<N extends ModuleController<T>, T> extends StatelessWidget {
+class _Body<N extends ModuleCubit<T>, T> extends StatelessWidget {
   const _Body({
     required this.config,
     required this.childBuilder,

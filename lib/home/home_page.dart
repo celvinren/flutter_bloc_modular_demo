@@ -4,13 +4,11 @@ import 'package:flutter_bloc_modular_demo/home/home_cubit.dart';
 import 'package:flutter_bloc_modular_demo/text_field_module/text_field_module_cubit.dart';
 import 'package:flutter_bloc_modular_demo/text_field_module/text_field_module_widget.dart';
 
-final userNameTextFieldConfig = ModuleConfig<TestController, String>(
-  id: 'userName',
-  controller: TestController(),
+final userNameTextFieldConfig = ModuleConfig<TextFieldController, String>(
+  controller: TextFieldController(),
 );
-final passwordTextFieldConfig = ModuleConfig<TestController, String>(
-  id: 'password',
-  controller: TestController(),
+final passwordTextFieldConfig = ModuleConfig<TextFieldController, String>(
+  controller: TextFieldController(),
 );
 
 class HomePage extends StatelessWidget {
@@ -42,15 +40,17 @@ class _HomeView extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            ModuleBuilder<TestController, String>(
+            ModuleBuilder<TextFieldController, String>(
               config: userNameTextFieldConfig,
-              builder: (bloc) => TextField(
+              builder: (bloc) => TextFormField(
+                initialValue: bloc.state,
                 onChanged: bloc.update,
               ),
             ),
-            ModuleBuilder<TestController, String>(
+            ModuleBuilder<TextFieldController, String>(
               config: passwordTextFieldConfig,
-              builder: (bloc) => TextField(
+              builder: (bloc) => TextFormField(
+                initialValue: bloc.state,
                 onChanged: bloc.update,
               ),
             ),
@@ -70,8 +70,8 @@ class _HomeView extends StatelessWidget {
   }
 }
 
-class TestController extends ModuleController<String> {
-  TestController({defaultValue}) : super(defaultValue: defaultValue);
+class TextFieldController extends ModuleCubit<String> {
+  TextFieldController({defaultValue}) : super(defaultValue: defaultValue);
 
   @override
   void update(String value) {
