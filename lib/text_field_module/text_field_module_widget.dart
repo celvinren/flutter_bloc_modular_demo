@@ -6,9 +6,9 @@ import 'package:get_it/get_it.dart';
 import 'package:rxdart/rxdart.dart';
 
 class TextFieldModuleConfig {
-  const TextFieldModuleConfig(this.id, {required this.child});
+  const TextFieldModuleConfig(this.id, {required this.childBuilder});
   final String id;
-  final Widget child;
+  final Widget Function(TextFieldModuleCubit<String>) childBuilder;
 
   Stream<String?> get textFieldModuleStream => GetIt.I
       .get<TextFieldModuleCubit<String>>(instanceName: id)
@@ -19,18 +19,18 @@ class TextFieldModuleConfig {
         config: this,
       );
 
-  TextFieldModuleCubit get textFieldModuleCubit =>
-      GetIt.I.get<TextFieldModuleCubit>(instanceName: id);
+  TextFieldModuleCubit<String> get textFieldModuleCubit =>
+      GetIt.I.get<TextFieldModuleCubit<String>>(instanceName: id);
 
-  TextFieldModuleCubit get textFieldModuleRegister {
-    return GetIt.I.registerSingleton<TextFieldModuleCubit>(
+  TextFieldModuleCubit<String> get textFieldModuleRegister {
+    return GetIt.I.registerSingleton<TextFieldModuleCubit<String>>(
       TextFieldModuleCubit<String>(defaultValue: ''),
       instanceName: id,
     );
   }
 
   void get textFieldModuleUnRegister {
-    GetIt.I.unregister<TextFieldModuleCubit>(
+    GetIt.I.unregister<TextFieldModuleCubit<String>>(
       instanceName: id,
     );
   }
@@ -88,7 +88,7 @@ class _Body extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     /// return your widget here
-    return config.child;
+    return config.childBuilder(config.textFieldModuleCubit);
     // return TextField(
     //   onChanged: context.read<TextFieldModuleCubit<String>>().update,
     // );

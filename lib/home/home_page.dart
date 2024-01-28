@@ -3,8 +3,16 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_bloc_modular_demo/home/home_cubit.dart';
 import 'package:flutter_bloc_modular_demo/text_field_module/text_field_module_widget.dart';
 
-const userNameTextFieldConfig = TextFieldModuleConfig('userName');
-const passwordTextFieldConfig = TextFieldModuleConfig('password');
+final userNameTextFieldConfig = TextFieldModuleConfig('userName',
+    childBuilder: (bloc) => TextField(
+          onChanged: bloc.update,
+        ));
+final passwordTextFieldConfig =
+    TextFieldModuleConfig('password', childBuilder: (bloc) {
+  return TextField(
+    onChanged: bloc.update,
+  );
+});
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
