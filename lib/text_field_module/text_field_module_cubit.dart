@@ -6,4 +6,10 @@ class ModuleCubit<T> extends Cubit<T?> {
   void update(T value) {
     emit(value);
   }
+
+  @override
+  Future<void> close() {
+    print('object');
+    return super.close();
+  }
 }

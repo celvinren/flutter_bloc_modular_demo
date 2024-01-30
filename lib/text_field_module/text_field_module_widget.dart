@@ -26,6 +26,7 @@ class ModuleConfig<N extends ModuleCubit<T>, T> {
   }
 
   void get unregisterModule {
+    controller.close();
     GetIt.I.unregister<N>(
       instanceName: id,
     );
